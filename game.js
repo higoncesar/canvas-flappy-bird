@@ -10,21 +10,27 @@ const context = canvas.getContext("2d");
 const bird = {
   sourceX: 0,
   sourceY: 0,
-  largura: 35,
-  altura: 25,
-  x: 70,
+  width: 35,
+  height: 25,
+  x: 10,
   y: 50,
+  speed: 0,
+  gravity: 0.25,
+  update: () => {
+    bird.speed = bird.speed + bird.gravity;
+    bird.y = bird.y + bird.speed;
+  },
   draw: () => {
     context.drawImage(
       sprites,
       bird.sourceX,
       bird.sourceY,
-      bird.largura,
-      bird.altura,
+      bird.width,
+      bird.height,
       bird.x,
       bird.y,
-      bird.largura,
-      bird.altura
+      bird.width,
+      bird.height
     );
   },
 };
@@ -32,8 +38,8 @@ const bird = {
 const ground = {
   sourceX: 0,
   sourceY: 610,
-  largura: 224,
-  altura: 112,
+  width: 224,
+  height: 112,
   x: 0,
   y: canvas.height - 112,
   draw: () => {
@@ -41,24 +47,24 @@ const ground = {
       sprites,
       ground.sourceX,
       ground.sourceY,
-      ground.largura,
-      ground.altura,
+      ground.width,
+      ground.height,
       ground.x,
       ground.y,
-      ground.largura,
-      ground.altura
+      ground.width,
+      ground.height
     );
 
     context.drawImage(
       sprites,
       ground.sourceX,
       ground.sourceY,
-      ground.largura,
-      ground.altura,
-      ground.x + ground.largura,
+      ground.width,
+      ground.height,
+      ground.x + ground.width,
       ground.y,
-      ground.largura,
-      ground.altura
+      ground.width,
+      ground.height
     );
   },
 };
@@ -66,8 +72,8 @@ const ground = {
 const background = {
   sourceX: 390,
   sourceY: 0,
-  largura: 276,
-  altura: 204,
+  width: 276,
+  height: 204,
   x: 0,
   y: canvas.height - 204,
   draw: () => {
@@ -78,34 +84,34 @@ const background = {
       sprites,
       background.sourceX,
       background.sourceY,
-      background.largura,
-      background.altura,
+      background.width,
+      background.height,
       background.x,
       background.y,
-      background.largura,
-      background.altura
+      background.width,
+      background.height
     );
 
     context.drawImage(
       sprites,
       background.sourceX,
       background.sourceY,
-      background.largura,
-      background.altura,
-      background.x + background.largura,
+      background.width,
+      background.height,
+      background.x + background.width,
       background.y,
-      background.largura,
-      background.altura
+      background.width,
+      background.height
     );
   },
 };
 
 function loop() {
+  bird.update();
   background.draw();
   ground.draw();
   bird.draw();
 
-  bird.y++;
   requestAnimationFrame(loop);
 }
 
