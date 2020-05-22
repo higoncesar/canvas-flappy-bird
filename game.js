@@ -1,6 +1,8 @@
 const sprites = new Image();
+const hitSound = new Audio();
 
 sprites.src = "./sprites.png";
+hitSound.src = "./efects/hit.wav";
 
 const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
@@ -27,7 +29,10 @@ function createBird() {
     },
     update() {
       if (collision(bird, ground)) {
-        screens.change(screens.START);
+        hitSound.play();
+        setTimeout(() => {
+          screens.change(screens.START);
+        }, 500);
         return;
       }
       bird.fall();
