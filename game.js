@@ -14,9 +14,16 @@ const bird = {
   y: 50,
   speed: 0,
   gravity: 0.25,
-  update: () => {
+  jump: 4.5,
+  rise: () => {
+    bird.speed = -bird.jump;
+  },
+  fall: () => {
     bird.speed = bird.speed + bird.gravity;
     bird.y = bird.y + bird.speed;
+  },
+  update: () => {
+    bird.fall();
   },
   draw: () => {
     context.drawImage(
@@ -149,7 +156,7 @@ const screens = {
       bird.update();
     },
     click: () => {
-      console.log("CLICK ON THE GAME SCREEN");
+      bird.rise();
     },
   },
   current: undefined,
