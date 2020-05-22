@@ -5,39 +5,61 @@ sprites.src = "./sprites.png";
 const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
 
-const bird = {
-  sourceX: 0,
-  sourceY: 0,
-  width: 35,
-  height: 25,
-  x: 10,
-  y: 50,
-  speed: 0,
-  gravity: 0.25,
-  jump: 4.5,
-  rise: () => {
-    bird.speed = -bird.jump;
-  },
-  fall: () => {
-    bird.speed = bird.speed + bird.gravity;
-    bird.y = bird.y + bird.speed;
-  },
-  update: () => {
-    bird.fall();
-  },
-  draw: () => {
-    context.drawImage(
-      sprites,
-      bird.sourceX,
-      bird.sourceY,
-      bird.width,
-      bird.height,
-      bird.x,
-      bird.y,
-      bird.width,
-      bird.height
-    );
-  },
+const globals = {};
+
+function createBird() {
+  const bird = {
+    sourceX: 0,
+    sourceY: 0,
+    width: 35,
+    height: 25,
+    x: 10,
+    y: 50,
+    speed: 0,
+    gravity: 0.25,
+    jump: 4.5,
+    rise() {
+      bird.speed = -bird.jump;
+    },
+    fall() {
+      bird.speed = bird.speed + bird.gravity;
+      bird.y = bird.y + bird.speed;
+    },
+    update() {
+      if (collision(bird, ground)) {
+        screens.change(screens.START);
+        return;
+      }
+      bird.fall();
+    },
+    draw() {
+      context.drawImage(
+        sprites,
+        bird.sourceX,
+        bird.sourceY,
+        bird.width,
+        bird.height,
+        bird.x,
+        bird.y,
+        bird.width,
+        bird.height
+      );
+    },
+  };
+
+  return bird;
+}
+
+const collision = (bird, ground) => {
+  const birdY = bird.y + bird.height;
+
+  const groundY = ground.y;
+
+  if (birdY >= groundY) {
+    return true;
+  }
+
+  return false;
 };
 
 const ground = {
@@ -47,7 +69,7 @@ const ground = {
   height: 112,
   x: 0,
   y: canvas.height - 112,
-  draw: () => {
+  draw() {
     context.drawImage(
       sprites,
       ground.sourceX,
@@ -81,7 +103,7 @@ const background = {
   height: 204,
   x: 0,
   y: canvas.height - 204,
-  draw: () => {
+  draw() {
     context.fillStyle = "#4ebbc5";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -118,7 +140,7 @@ const messageGetReady = {
   height: 152,
   x: (canvas.width - 171) / 2,
   y: 50,
-  draw: () => {
+  draw() {
     context.drawImage(
       sprites,
       messageGetReady.sourceX,
@@ -135,33 +157,40 @@ const messageGetReady = {
 
 const screens = {
   START: {
-    draw: () => {
+    initialize() {
+      globals.bird = createBird();
+    },
+    draw() {
       background.draw();
       ground.draw();
-      bird.draw();
+      globals.bird.draw();
       messageGetReady.draw();
     },
-    update: () => {},
-    click: () => {
+    update() {},
+    click() {
       screens.change(screens.GAME);
     },
   },
   GAME: {
-    draw: () => {
+    draw() {
       background.draw();
       ground.draw();
-      bird.draw();
+      globals.bird.draw();
     },
-    update: () => {
-      bird.update();
+    update() {
+      globals.bird.update();
     },
-    click: () => {
-      bird.rise();
+    click() {
+      globals.bird.rise();
     },
   },
   current: undefined,
-  change: (screen) => {
+  change(screen) {
     screens.current = screen;
+
+    if (screen.initialize) {
+      screen.initialize();
+    }
   },
 };
 
