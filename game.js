@@ -1,5 +1,3 @@
-console.log("Flap Bird ");
-
 const sprites = new Image();
 
 sprites.src = "./sprites.png";
@@ -106,13 +104,69 @@ const background = {
   },
 };
 
-function loop() {
-  bird.update();
-  background.draw();
-  ground.draw();
-  bird.draw();
+const messageGetReady = {
+  sourceX: 136,
+  sourceY: 0,
+  width: 171,
+  height: 152,
+  x: (canvas.width - 171) / 2,
+  y: 50,
+  draw: () => {
+    context.drawImage(
+      sprites,
+      messageGetReady.sourceX,
+      messageGetReady.sourceY,
+      messageGetReady.width,
+      messageGetReady.height,
+      messageGetReady.x,
+      messageGetReady.y,
+      messageGetReady.width,
+      messageGetReady.height
+    );
+  },
+};
 
+const screens = {
+  START: {
+    draw: () => {
+      background.draw();
+      ground.draw();
+      bird.draw();
+      messageGetReady.draw();
+    },
+    update: () => {},
+    click: () => {
+      screens.change(screens.GAME);
+    },
+  },
+  GAME: {
+    draw: () => {
+      background.draw();
+      ground.draw();
+      bird.draw();
+    },
+    update: () => {
+      bird.update();
+    },
+    click: () => {
+      console.log("CLICK ON THE GAME SCREEN");
+    },
+  },
+  current: undefined,
+  change: (screen) => {
+    screens.current = screen;
+  },
+};
+
+function loop() {
+  screens.current.draw();
+  screens.current.update();
   requestAnimationFrame(loop);
 }
 
+canvas.addEventListener("click", function () {
+  screens.current.click();
+});
+
+screens.change(screens.START);
 loop();
