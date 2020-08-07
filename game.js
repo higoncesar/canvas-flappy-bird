@@ -8,15 +8,14 @@ const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
 
 const globals = {};
+let frame = 0;
 
 function createBird() {
   const bird = {
-    sourceX: 0,
-    sourceY: 0,
     width: 35,
     height: 25,
-    x: 10,
-    y: 50,
+    x: 145,
+    y: 105,
     speed: 0,
     gravity: 0.25,
     jump: 4.5,
@@ -28,7 +27,7 @@ function createBird() {
       bird.y = bird.y + bird.speed;
     },
     update() {
-      if (collision(bird, ground)) {
+      if (collision()) {
         hitSound.play();
         setTimeout(() => {
           screens.change(screens.START);
@@ -37,11 +36,27 @@ function createBird() {
       }
       bird.fall();
     },
+    currentFrame: 0,
+    updateCurrentFrame() {
+      const frameInterval = 5;
+
+      if ((frame % frameInterval) === 0) {
+        bird.currentFrame = (bird.currentFrame + 1) % bird.moviments.length;
+      }
+    },
+    moviments: [
+      { sourceX: 0, sourceY: 0 },//wing up
+      { sourceX: 0, sourceY: 26 },//wing in the middle
+      { sourceX: 0, sourceY: 52 },//wing down
+      { sourceX: 0, sourceY: 26 },//wing in the middle
+    ],
     draw() {
+      bird.updateCurrentFrame();
+      const { sourceX, sourceY } = bird.moviments[bird.currentFrame];
       context.drawImage(
         sprites,
-        bird.sourceX,
-        bird.sourceY,
+        sourceX,
+        sourceY,
         bird.width,
         bird.height,
         bird.x,
@@ -55,10 +70,10 @@ function createBird() {
   return bird;
 }
 
-const collision = (bird, ground) => {
-  const birdY = bird.y + bird.height;
+const collision = () => {
+  const birdY = globals.bird.y + globals.bird.height;
 
-  const groundY = ground.y;
+  const groundY = globals.ground.y;
 
   if (birdY >= groundY) {
     return true;
@@ -67,39 +82,46 @@ const collision = (bird, ground) => {
   return false;
 };
 
-const ground = {
-  sourceX: 0,
-  sourceY: 610,
-  width: 224,
-  height: 112,
-  x: 0,
-  y: canvas.height - 112,
-  draw() {
-    context.drawImage(
-      sprites,
-      ground.sourceX,
-      ground.sourceY,
-      ground.width,
-      ground.height,
-      ground.x,
-      ground.y,
-      ground.width,
-      ground.height
-    );
+function createGround() {
+  const ground = {
+    sourceX: 0,
+    sourceY: 610,
+    width: 224,
+    height: 112,
+    x: 0,
+    y: canvas.height - 112,
+    update() {
+      ground.x = (ground.x - 1) % (ground.width / 2);
+    },
+    draw() {
+      context.drawImage(
+        sprites,
+        ground.sourceX,
+        ground.sourceY,
+        ground.width,
+        ground.height,
+        ground.x,
+        ground.y,
+        ground.width,
+        ground.height
+      );
 
-    context.drawImage(
-      sprites,
-      ground.sourceX,
-      ground.sourceY,
-      ground.width,
-      ground.height,
-      ground.x + ground.width,
-      ground.y,
-      ground.width,
-      ground.height
-    );
-  },
-};
+      context.drawImage(
+        sprites,
+        ground.sourceX,
+        ground.sourceY,
+        ground.width,
+        ground.height,
+        ground.x + ground.width,
+        ground.y,
+        ground.width,
+        ground.height
+      );
+    },
+  };
+
+  return ground;
+}
 
 const background = {
   sourceX: 390,
@@ -164,14 +186,15 @@ const screens = {
   START: {
     initialize() {
       globals.bird = createBird();
+      globals.ground = createGround();
     },
     draw() {
       background.draw();
-      ground.draw();
+      globals.ground.draw();
       globals.bird.draw();
       messageGetReady.draw();
     },
-    update() {},
+    update() { },
     click() {
       screens.change(screens.GAME);
     },
@@ -179,11 +202,12 @@ const screens = {
   GAME: {
     draw() {
       background.draw();
-      ground.draw();
+      globals.ground.draw();
       globals.bird.draw();
     },
     update() {
       globals.bird.update();
+      globals.ground.update();
     },
     click() {
       globals.bird.rise();
@@ -200,6 +224,7 @@ const screens = {
 };
 
 function loop() {
+  frame = ++frame;
   screens.current.draw();
   screens.current.update();
   requestAnimationFrame(loop);
@@ -207,6 +232,12 @@ function loop() {
 
 canvas.addEventListener("click", function () {
   screens.current.click();
+});
+
+window.addEventListener("keypress", function (event) {
+  if (event.keyCode === 32) {
+    screens.current.click();
+  }
 });
 
 screens.change(screens.START);
