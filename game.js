@@ -10,12 +10,49 @@ const context = canvas.getContext("2d");
 const globals = {};
 let frame = 0;
 
+const background = {
+  sourceX: 390,
+  sourceY: 0,
+  width: 276,
+  height: 204,
+  x: 0,
+  y: canvas.height - 204,
+  draw() {
+    context.fillStyle = "#4ebbc5";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    context.drawImage(
+      sprites,
+      background.sourceX,
+      background.sourceY,
+      background.width,
+      background.height,
+      background.x,
+      background.y,
+      background.width,
+      background.height
+    );
+
+    context.drawImage(
+      sprites,
+      background.sourceX,
+      background.sourceY,
+      background.width,
+      background.height,
+      background.x + background.width,
+      background.y,
+      background.width,
+      background.height
+    );
+  },
+};
+
 function createBird() {
   const bird = {
     width: 35,
     height: 25,
-    x: 145,
-    y: 105,
+    x: 55,
+    y: 135,
     speed: 0,
     gravity: 0.25,
     jump: 4.5,
@@ -27,7 +64,8 @@ function createBird() {
       bird.y = bird.y + bird.speed;
     },
     update() {
-      if (collision()) {
+      bird.updateCurrentFrame();
+      if (collisionWithGround()) {
         hitSound.play();
         setTimeout(() => {
           screens.change(screens.START);
@@ -51,7 +89,6 @@ function createBird() {
       { sourceX: 0, sourceY: 26 },//wing in the middle
     ],
     draw() {
-      bird.updateCurrentFrame();
       const { sourceX, sourceY } = bird.moviments[bird.currentFrame];
       context.drawImage(
         sprites,
@@ -69,18 +106,6 @@ function createBird() {
 
   return bird;
 }
-
-const collision = () => {
-  const birdY = globals.bird.y + globals.bird.height;
-
-  const groundY = globals.ground.y;
-
-  if (birdY >= groundY) {
-    return true;
-  }
-
-  return false;
-};
 
 function createGround() {
   const ground = {
@@ -123,41 +148,81 @@ function createGround() {
   return ground;
 }
 
-const background = {
-  sourceX: 390,
-  sourceY: 0,
-  width: 276,
-  height: 204,
-  x: 0,
-  y: canvas.height - 204,
-  draw() {
-    context.fillStyle = "#4ebbc5";
-    context.fillRect(0, 0, canvas.width, canvas.height);
+const downPipe = {
+  sourceX: 52,
+  sourceY: 169,
+  width: 52,
+  height: 400,
 
+  draw({ x, y }) {
     context.drawImage(
       sprites,
-      background.sourceX,
-      background.sourceY,
-      background.width,
-      background.height,
-      background.x,
-      background.y,
-      background.width,
-      background.height
+      downPipe.sourceX,
+      downPipe.sourceY,
+      downPipe.width,
+      downPipe.height,
+      x,
+      y,
+      downPipe.width,
+      downPipe.height
     );
+  }
+};
 
+const upPipe = {
+  sourceX: 0,
+  sourceY: 169,
+  width: 52,
+  height: 400,
+
+  draw({ y, x }) {
     context.drawImage(
       sprites,
-      background.sourceX,
-      background.sourceY,
-      background.width,
-      background.height,
-      background.x + background.width,
-      background.y,
-      background.width,
-      background.height
+      upPipe.sourceX,
+      upPipe.sourceY,
+      upPipe.width,
+      upPipe.height,
+      x,
+      y,
+      upPipe.width,
+      upPipe.height
     );
-  },
+  }
+};
+
+function createPipePair() {
+  const pipePair = {
+    x: canvas.width + 52,
+    y: -365, //min: -140 | max: -365
+    gap: 65,
+    speed: 1,
+
+    draw() {
+      //downPipe
+      downPipe.draw({ x: pipePair.x, y: pipePair.y });
+
+      //UpPipe
+      const yUpPipe = pipePair.y + downPipe.height + pipePair.gap;
+      upPipe.draw({ x: pipePair.x, y: yUpPipe });
+    },
+    update() {
+      pipePair.x = pipePair.x - pipePair.speed;
+    }
+  }
+
+  return pipePair;
+}
+
+function collisionWithGround() {
+  const birdY = globals.bird.y + globals.bird.height;
+
+  const groundY = globals.ground.y;
+
+  if (birdY >= groundY) {
+    return true;
+  }
+
+  return false;
 };
 
 const messageGetReady = {
@@ -187,6 +252,7 @@ const screens = {
     initialize() {
       globals.bird = createBird();
       globals.ground = createGround();
+      globals.pipePair = createPipePair();
     },
     draw() {
       background.draw();
@@ -202,12 +268,14 @@ const screens = {
   GAME: {
     draw() {
       background.draw();
+      globals.pipePair.draw();
       globals.ground.draw();
       globals.bird.draw();
     },
     update() {
       globals.bird.update();
       globals.ground.update();
+      globals.pipePair.update();
     },
     click() {
       globals.bird.rise();
