@@ -47,6 +47,28 @@ const background = {
   },
 };
 
+const messageGetReady = {
+  sourceX: 136,
+  sourceY: 0,
+  width: 171,
+  height: 152,
+  x: (canvas.width - 171) / 2,
+  y: 50,
+  draw() {
+    context.drawImage(
+      sprites,
+      messageGetReady.sourceX,
+      messageGetReady.sourceY,
+      messageGetReady.width,
+      messageGetReady.height,
+      messageGetReady.x,
+      messageGetReady.y,
+      messageGetReady.width,
+      messageGetReady.height
+    );
+  },
+};
+
 function createBird() {
   const bird = {
     width: 35,
@@ -64,12 +86,11 @@ function createBird() {
       bird.y = bird.y + bird.speed;
     },
     update() {
-      bird.updateCurrentFrame();
       if (collisionWithGround()) {
         hitSound.play();
-        setTimeout(() => {
+        hitSound.onended = () => {
           screens.change(screens.START);
-        }, 500);
+        }
         return;
       }
       bird.fall();
@@ -89,6 +110,7 @@ function createBird() {
       { sourceX: 0, sourceY: 26 },//wing in the middle
     ],
     draw() {
+      bird.updateCurrentFrame();
       const { sourceX, sourceY } = bird.moviments[bird.currentFrame];
       context.drawImage(
         sprites,
@@ -190,27 +212,48 @@ const upPipe = {
   }
 };
 
-function createPipePair() {
-  const pipePair = {
-    x: canvas.width + 52,
-    y: -365, //min: -140 | max: -365
+function createPipesPairs() {
+  const pipesPairs = {
+    yMin: -365,
+    yMax: -140,
     gap: 65,
-    speed: 1,
+    speed: 1.8,
+
+    pairs: [],
 
     draw() {
-      //downPipe
-      downPipe.draw({ x: pipePair.x, y: pipePair.y });
+      pipesPairs.pairs.forEach(pair => {
+        //downPipe
+        downPipe.draw({ x: pair.x, y: pair.yRandom });
 
-      //UpPipe
-      const yUpPipe = pipePair.y + downPipe.height + pipePair.gap;
-      upPipe.draw({ x: pipePair.x, y: yUpPipe });
+        //UpPipe
+        const yUpPipe = pair.yRandom + downPipe.height + pipesPairs.gap;
+        upPipe.draw({ x: pair.x, y: yUpPipe });
+      })
     },
+
     update() {
-      pipePair.x = pipePair.x - pipePair.speed;
+      const frameInterval = 100;
+      const currentFrameInterval = frame % frameInterval;
+
+      if (currentFrameInterval === 0) {
+        pipesPairs.pairs.push({
+          x: canvas.width + 52,
+          yRandom: Math.random() * (pipesPairs.yMax - pipesPairs.yMin) + pipesPairs.yMin,
+        });
+      }
+
+      pipesPairs.pairs.forEach((pair, index, object) => {
+        if (pair.x < -downPipe.width) {
+          object.splice(index, 1);
+        } else {
+          pair.x = pair.x - pipesPairs.speed;
+        }
+      });
     }
   }
 
-  return pipePair;
+  return pipesPairs;
 }
 
 function collisionWithGround() {
@@ -225,34 +268,12 @@ function collisionWithGround() {
   return false;
 };
 
-const messageGetReady = {
-  sourceX: 136,
-  sourceY: 0,
-  width: 171,
-  height: 152,
-  x: (canvas.width - 171) / 2,
-  y: 50,
-  draw() {
-    context.drawImage(
-      sprites,
-      messageGetReady.sourceX,
-      messageGetReady.sourceY,
-      messageGetReady.width,
-      messageGetReady.height,
-      messageGetReady.x,
-      messageGetReady.y,
-      messageGetReady.width,
-      messageGetReady.height
-    );
-  },
-};
-
 const screens = {
   START: {
     initialize() {
       globals.bird = createBird();
       globals.ground = createGround();
-      globals.pipePair = createPipePair();
+      globals.pipesPairs = createPipesPairs();
     },
     draw() {
       background.draw();
@@ -268,14 +289,14 @@ const screens = {
   GAME: {
     draw() {
       background.draw();
-      globals.pipePair.draw();
-      globals.ground.draw();
       globals.bird.draw();
+      globals.pipesPairs.draw();
+      globals.ground.draw();
     },
     update() {
       globals.bird.update();
       globals.ground.update();
-      globals.pipePair.update();
+      globals.pipesPairs.update();
     },
     click() {
       globals.bird.rise();
