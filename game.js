@@ -78,6 +78,8 @@ function createBird() {
     speed: 0,
     gravity: 0.25,
     jump: 4.5,
+    dead: false,
+
     rise() {
       bird.speed = -bird.jump;
     },
@@ -85,14 +87,58 @@ function createBird() {
       bird.speed = bird.speed + bird.gravity;
       bird.y = bird.y + bird.speed;
     },
+    collision: () => {
+      return {
+        withGround: () => {
+          const birdY = bird.y + bird.height;
+
+          const groundY = globals.ground.y;
+
+          if (birdY >= groundY) {
+            bird.dead = true;
+            return true;
+          }
+
+          return false;
+        },
+        withPipe: () => {
+          const invadePipeArea = globals.pipesPairs.pairs[0] && bird.x + bird.width >= globals.pipesPairs.pairs[0].x;
+
+          if (invadePipeArea) {
+            const leavePipeArea = bird.x > globals.pipesPairs.pairs[0].x + upPipe.width;
+
+            if (!leavePipeArea) {
+              if (bird.y <= globals.pipesPairs.pairs[0].skyPipe.y + globals.pipesPairs.pairs[0].skyPipe.height) {
+                bird.dead = true;
+                return true;
+              }
+
+              if (bird.y >= globals.pipesPairs.pairs[0].groundPipe.y) {
+                bird.dead = true;
+                return true;
+              }
+            }
+          }
+          return false;
+        }
+      }
+    },
     update() {
-      if (collisionWithGround()) {
+      if (bird.collision().withGround()) {
         hitSound.play();
         hitSound.onended = () => {
           screens.change(screens.START);
         }
         return;
       }
+
+      if (bird.collision().withPipe()) {
+        setTimeout(() => {
+          screens.change(screens.START);
+        }, [500]);
+        return;
+      }
+
       bird.fall();
     },
     currentFrame: 0,
@@ -138,7 +184,9 @@ function createGround() {
     x: 0,
     y: canvas.height - 112,
     update() {
-      ground.x = (ground.x - 1) % (ground.width / 2);
+      if (!globals.bird.dead) {
+        ground.x = (ground.x - 1) % (ground.width / 2);
+      }
     },
     draw() {
       context.drawImage(
@@ -188,6 +236,13 @@ const downPipe = {
       downPipe.width,
       downPipe.height
     );
+  },
+  getDimessions: () => {
+    const { width, height } = downPipe;
+    return {
+      width,
+      height
+    }
   }
 };
 
@@ -209,6 +264,13 @@ const upPipe = {
       upPipe.width,
       upPipe.height
     );
+  },
+  getDimessions: () => {
+    const { width, height } = upPipe;
+    return {
+      width,
+      height
+    }
   }
 };
 
@@ -224,49 +286,46 @@ function createPipesPairs() {
     draw() {
       pipesPairs.pairs.forEach(pair => {
         //downPipe
-        downPipe.draw({ x: pair.x, y: pair.yRandom });
+        downPipe.draw({ x: pair.x, y: pair.skyPipe.y });
 
         //UpPipe
-        const yUpPipe = pair.yRandom + downPipe.height + pipesPairs.gap;
-        upPipe.draw({ x: pair.x, y: yUpPipe });
+        upPipe.draw({ x: pair.x, y: pair.groundPipe.y });
       })
     },
 
     update() {
-      const frameInterval = 100;
-      const currentFrameInterval = frame % frameInterval;
+      if (!globals.bird.dead) {
+        const frameInterval = 100;
+        const currentFrameInterval = frame % frameInterval;
 
-      if (currentFrameInterval === 0) {
-        pipesPairs.pairs.push({
-          x: canvas.width + 52,
-          yRandom: Math.random() * (pipesPairs.yMax - pipesPairs.yMin) + pipesPairs.yMin,
+        if (currentFrameInterval === 0) {
+          const x = canvas.width + 52;
+          const yRandom = Math.random() * (pipesPairs.yMax - pipesPairs.yMin) + pipesPairs.yMin;
+          const yWithGap = yRandom + downPipe.height + pipesPairs.gap;
+
+          const skyPipe = { ...downPipe.getDimessions(), y: yRandom };
+          const groundPipe = { ...downPipe.getDimessions(), y: yWithGap };
+
+          pipesPairs.pairs.push({
+            x,
+            skyPipe,
+            groundPipe
+          });
+        }
+
+        pipesPairs.pairs.forEach((pair, index, object) => {
+          if (pair.x < -pair.skyPipe.width) {
+            object.splice(index, 1);
+          } else {
+            pair.x = pair.x - pipesPairs.speed;
+          }
         });
       }
-
-      pipesPairs.pairs.forEach((pair, index, object) => {
-        if (pair.x < -downPipe.width) {
-          object.splice(index, 1);
-        } else {
-          pair.x = pair.x - pipesPairs.speed;
-        }
-      });
     }
   }
 
   return pipesPairs;
 }
-
-function collisionWithGround() {
-  const birdY = globals.bird.y + globals.bird.height;
-
-  const groundY = globals.ground.y;
-
-  if (birdY >= groundY) {
-    return true;
-  }
-
-  return false;
-};
 
 const screens = {
   START: {
