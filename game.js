@@ -73,12 +73,13 @@ function createBird() {
   const bird = {
     width: 35,
     height: 25,
-    x: 55,
+    x: 40,
     y: 135,
     speed: 0,
     gravity: 0.25,
     jump: 4.5,
     dead: false,
+    score: 0,
 
     rise() {
       bird.speed = -bird.jump;
@@ -113,7 +114,7 @@ function createBird() {
                 return true;
               }
 
-              if (bird.y >= globals.pipesPairs.pairs[0].groundPipe.y) {
+              if (bird.y + bird.height >= globals.pipesPairs.pairs[0].groundPipe.y) {
                 bird.dead = true;
                 return true;
               }
@@ -122,6 +123,10 @@ function createBird() {
           return false;
         }
       }
+    },
+    makePoint: () => {
+      bird.score = bird.score + 1;
+      console.log(bird.score);
     },
     update() {
       if (bird.collision().withGround()) {
@@ -139,7 +144,9 @@ function createBird() {
         return;
       }
 
-      bird.fall();
+      if (!bird.dead) {
+        bird.fall();
+      }
     },
     currentFrame: 0,
     updateCurrentFrame() {
@@ -173,7 +180,7 @@ function createBird() {
   };
 
   return bird;
-}
+};
 
 function createGround() {
   const ground = {
@@ -216,7 +223,7 @@ function createGround() {
   };
 
   return ground;
-}
+};
 
 const downPipe = {
   sourceX: 52,
@@ -278,7 +285,7 @@ function createPipesPairs() {
   const pipesPairs = {
     yMin: -365,
     yMax: -140,
-    gap: 65,
+    gap: 75,
     speed: 1.8,
 
     pairs: [],
@@ -315,6 +322,7 @@ function createPipesPairs() {
 
         pipesPairs.pairs.forEach((pair, index, object) => {
           if (pair.x < -pair.skyPipe.width) {
+            globals.bird.makePoint();
             object.splice(index, 1);
           } else {
             pair.x = pair.x - pipesPairs.speed;
@@ -325,7 +333,7 @@ function createPipesPairs() {
   }
 
   return pipesPairs;
-}
+};
 
 const screens = {
   START: {
