@@ -1,8 +1,10 @@
 const sprites = new Image();
 const hitSound = new Audio();
+const pointSound = new Audio();
 
 sprites.src = "./sprites.png";
 hitSound.src = "./efects/hit.wav";
+pointSound.src = "./efects/point.wav"
 
 const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
@@ -69,6 +71,17 @@ const messageGetReady = {
   },
 };
 
+const scoreboard = {
+  font: "bold 30px FlappyBird",
+  color: "#FFF",
+
+  draw() {
+    context.font = scoreboard.font;
+    context.fillStyle = scoreboard.color;
+    context.fillText(globals.bird.score, canvas.width / 2, 40)
+  }
+}
+
 function createBird() {
   const bird = {
     width: 35,
@@ -125,8 +138,8 @@ function createBird() {
       }
     },
     makePoint: () => {
+      pointSound.play();
       bird.score = bird.score + 1;
-      console.log(bird.score);
     },
     update() {
       if (bird.collision().withGround()) {
@@ -285,7 +298,7 @@ function createPipesPairs() {
   const pipesPairs = {
     yMin: -365,
     yMax: -140,
-    gap: 75,
+    gap: 80,
     speed: 1.8,
 
     pairs: [],
@@ -359,6 +372,7 @@ const screens = {
       globals.bird.draw();
       globals.pipesPairs.draw();
       globals.ground.draw();
+      scoreboard.draw();
     },
     update() {
       globals.bird.update();
