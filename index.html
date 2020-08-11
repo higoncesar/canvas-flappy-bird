@@ -1,30 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Canvas Flappy Bird</title>
-  </head>
-  <body>
-    <canvas id="game-canvas" width="320" height="480"></canvas>
 
-    <style>
-      body {
-        min-height: 100vh;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canvas Flappy Bird</title>
+</head>
 
-      canvas {
-        border: 1px solid #000;
-        display: block;
-        margin: 0 auto;
-      }
-    </style>
+<body>
+  <canvas id="game-canvas" width="320" height="480"></canvas>
 
-    <script src="./game.js"></script>
-  </body>
+  <style>
+    @font-face {
+      font-family: 'FlappyBird';
+      src: url('./FlappyBird.ttf') format('truetype');
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      font-family: "FlappyBird";
+      border: 1px solid #000;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+
+  <script src="./game.js"></script>
+</body>
+
 </html>

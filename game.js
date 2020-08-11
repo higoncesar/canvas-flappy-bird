@@ -72,7 +72,7 @@ const messageGetReady = {
 };
 
 const scoreboard = {
-  font: "bold 30px FlappyBird",
+  font: "30px FlappyBird",
   color: "#FFF",
 
   draw() {
