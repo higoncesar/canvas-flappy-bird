@@ -188,7 +188,7 @@ function createBird() {
   const bird = {
     width: 33,
     height: 23,
-    x: 40,
+    x: 20,
     y: 135,
     speed: 0,
     gravity: 0.25,
@@ -290,12 +290,12 @@ function createBird() {
         bird.height
       );
 
-      // context.strokeRect(
-      //   bird.x,
-      //   bird.y,
-      //   bird.width,
-      //   bird.height
-      // );
+      context.strokeRect(
+        bird.x,
+        bird.y,
+        bird.width,
+        bird.height
+      );
     },
   };
 
