@@ -98,23 +98,21 @@ const medal = {
     height: 44,
   },
   getAward: () => {
-    const bestScore = localStorage.getItem('@FlappyBird/bestScore');
-
     let award = undefined;
 
-    if (bestScore >= 10 && bestScore < 20) {
+    if (score >= 10 && score < 20) {
       award = medal.bronze;
     }
 
-    if (bestScore >= 20 && bestScore < 30) {
+    if (score >= 20 && score < 30) {
       award = medal.silver;
     }
 
-    if (bestScore >= 30 && bestScore < 40) {
+    if (score >= 30 && score < 40) {
       award = medal.gold;
     }
 
-    if (bestScore >= 40) {
+    if (score >= 40) {
       award = medal.platinum;
     }
 
