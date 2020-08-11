@@ -469,7 +469,7 @@ const screens = {
       globals.bird = createBird();
       globals.ground = createGround();
       globals.pipesPairs = createPipesPairs();
-      //score = 0;
+      score = 0;
     },
     draw() {
       background.draw();
