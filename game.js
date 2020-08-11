@@ -11,7 +11,7 @@ const context = canvas.getContext("2d");
 
 const globals = {};
 let frame = 0;
-let score = 100;
+let score = 0;
 
 const background = {
   sourceX: 390,
@@ -72,6 +72,56 @@ const messageGetReady = {
   },
 };
 
+const medal = {
+  bronze: {
+    sourceX: 48,
+    sourceY: 124,
+    width: 44,
+    height: 44,
+  },
+  silver: {
+    sourceX: 48,
+    sourceY: 78,
+    width: 44,
+    height: 44,
+  },
+  gold: {
+    sourceX: 0,
+    sourceY: 124,
+    width: 44,
+    height: 44,
+  },
+  platinum: {
+    sourceX: 0,
+    sourceY: 78,
+    width: 44,
+    height: 44,
+  },
+  getAward: () => {
+    const bestScore = localStorage.getItem('@FlappyBird/bestScore');
+
+    let award = undefined;
+
+    if (bestScore >= 10 && bestScore < 20) {
+      award = medal.bronze;
+    }
+
+    if (bestScore >= 20 && bestScore < 30) {
+      award = medal.silver;
+    }
+
+    if (bestScore >= 30 && bestScore < 40) {
+      award = medal.gold;
+    }
+
+    if (bestScore >= 40) {
+      award = medal.platinum;
+    }
+
+    return award;
+  }
+}
+
 const messageGameOver = {
   sourceX: 134,
   sourceY: 153,
@@ -103,7 +153,25 @@ const messageGameOver = {
     const bestScore = localStorage.getItem('@FlappyBird/bestScore');
     context.font = messageGameOver.font;
     context.fillStyle = messageGameOver.color;
-    context.fillText(bestScore, 225, 185)
+    context.fillText(bestScore, 225, 185);
+
+
+    const award = medal.getAward();
+
+    if (award) {
+      context.drawImage(
+        sprites,
+        award.sourceX,
+        award.sourceY,
+        award.width,
+        award.height,
+        73,
+        137,
+        award.width,
+        award.height
+      );
+    }
+
   },
 }
 
@@ -401,7 +469,7 @@ const screens = {
       globals.bird = createBird();
       globals.ground = createGround();
       globals.pipesPairs = createPipesPairs();
-      score = 0;
+      //score = 0;
     },
     draw() {
       background.draw();
