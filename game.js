@@ -11,6 +11,7 @@ const context = canvas.getContext("2d");
 
 const globals = {};
 let frame = 0;
+let score = 100;
 
 const background = {
   sourceX: 390,
@@ -71,6 +72,41 @@ const messageGetReady = {
   },
 };
 
+const messageGameOver = {
+  sourceX: 134,
+  sourceY: 153,
+  width: 226,
+  height: 200,
+  x: (canvas.width - 226) / 2,
+  y: 50,
+
+  font: "18px FlappyBird",
+  color: "#FFF",
+
+  draw() {
+    context.drawImage(
+      sprites,
+      messageGameOver.sourceX,
+      messageGameOver.sourceY,
+      messageGameOver.width,
+      messageGameOver.height,
+      messageGameOver.x,
+      messageGameOver.y,
+      messageGameOver.width,
+      messageGameOver.height
+    );
+
+    context.font = messageGameOver.font;
+    context.fillStyle = messageGameOver.color;
+    context.fillText(score, 225, 145);
+
+    const bestScore = localStorage.getItem('@FlappyBird/bestScore');
+    context.font = messageGameOver.font;
+    context.fillStyle = messageGameOver.color;
+    context.fillText(bestScore, 225, 185)
+  },
+}
+
 const scoreboard = {
   font: "30px FlappyBird",
   color: "#FFF",
@@ -78,21 +114,20 @@ const scoreboard = {
   draw() {
     context.font = scoreboard.font;
     context.fillStyle = scoreboard.color;
-    context.fillText(globals.bird.score, canvas.width / 2, 40)
+    context.fillText(score, canvas.width / 2, 40)
   }
 }
 
 function createBird() {
   const bird = {
-    width: 35,
-    height: 25,
+    width: 33,
+    height: 23,
     x: 40,
     y: 135,
     speed: 0,
     gravity: 0.25,
     jump: 4.5,
     dead: false,
-    score: 0,
 
     rise() {
       bird.speed = -bird.jump;
@@ -139,21 +174,20 @@ function createBird() {
     },
     makePoint: () => {
       pointSound.play();
-      bird.score = bird.score + 1;
+      score = score + 1;
     },
     update() {
-      if (bird.collision().withGround()) {
+      if (bird.collision().withGround() || bird.collision().withPipe()) {
+        const curretBestScore = localStorage.getItem("@FlappyBird/bestScore");
+
+        if (score > Number(curretBestScore)) {
+          localStorage.setItem("@FlappyBird/bestScore", score);
+        }
+
         hitSound.play();
         hitSound.onended = () => {
-          screens.change(screens.START);
+          screens.change(screens.GAME_OVER);
         }
-        return;
-      }
-
-      if (bird.collision().withPipe()) {
-        setTimeout(() => {
-          screens.change(screens.START);
-        }, [500]);
         return;
       }
 
@@ -189,6 +223,13 @@ function createBird() {
         bird.width,
         bird.height
       );
+
+      // context.strokeRect(
+      //   bird.x,
+      //   bird.y,
+      //   bird.width,
+      //   bird.height
+      // );
     },
   };
 
@@ -315,7 +356,7 @@ function createPipesPairs() {
 
     update() {
       if (!globals.bird.dead) {
-        const frameInterval = 100;
+        const frameInterval = 110;
         const currentFrameInterval = frame % frameInterval;
 
         if (currentFrameInterval === 0) {
@@ -351,9 +392,16 @@ function createPipesPairs() {
 const screens = {
   START: {
     initialize() {
+      const bestScore = localStorage.getItem("@FlappyBird/bestScore");
+
+      if (!bestScore) {
+        localStorage.setItem("@FlappyBird/bestScore", 0);
+      }
+
       globals.bird = createBird();
       globals.ground = createGround();
       globals.pipesPairs = createPipesPairs();
+      score = 0;
     },
     draw() {
       background.draw();
@@ -381,6 +429,22 @@ const screens = {
     },
     click() {
       globals.bird.rise();
+    },
+  },
+  GAME_OVER: {
+    initialize() {
+      globals.bird = createBird();
+      globals.ground = createGround();
+      globals.pipesPairs = createPipesPairs();
+    },
+    draw() {
+      background.draw();
+      globals.ground.draw();
+      messageGameOver.draw();
+    },
+    update() { },
+    click() {
+      screens.change(screens.START);
     },
   },
   current: undefined,
