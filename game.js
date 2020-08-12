@@ -194,6 +194,7 @@ function createBird() {
     gravity: 0.25,
     jump: 4.5,
     dead: false,
+    radius: 11.5,
 
     rise() {
       bird.speed = -bird.jump;
@@ -205,30 +206,30 @@ function createBird() {
     collision: () => {
       return {
         withGround: () => {
-          const birdY = bird.y + bird.height;
+          const { y } = bird.getCenterCoordinates();
 
           const groundY = globals.ground.y;
 
-          if (birdY >= groundY) {
+          if (y + bird.radius >= groundY) {
             bird.dead = true;
             return true;
           }
 
-          return false;
         },
         withPipe: () => {
-          const invadePipeArea = globals.pipesPairs.pairs[0] && bird.x + bird.width >= globals.pipesPairs.pairs[0].x;
+          const { x, y } = bird.getCenterCoordinates();
+          const invadePipeArea = globals.pipesPairs.pairs[0] && x + bird.radius >= globals.pipesPairs.pairs[0].x;
 
           if (invadePipeArea) {
-            const leavePipeArea = bird.x > globals.pipesPairs.pairs[0].x + upPipe.width;
+            const leavePipeArea = x - bird.radius > globals.pipesPairs.pairs[0].x + upPipe.width;
 
             if (!leavePipeArea) {
-              if (bird.y <= globals.pipesPairs.pairs[0].skyPipe.y + globals.pipesPairs.pairs[0].skyPipe.height) {
+              if (y - bird.radius <= globals.pipesPairs.pairs[0].skyPipe.y + globals.pipesPairs.pairs[0].skyPipe.height) {
                 bird.dead = true;
                 return true;
               }
 
-              if (bird.y + bird.height >= globals.pipesPairs.pairs[0].groundPipe.y) {
+              if (y + bird.radius >= globals.pipesPairs.pairs[0].groundPipe.y) {
                 bird.dead = true;
                 return true;
               }
@@ -289,14 +290,19 @@ function createBird() {
         bird.width,
         bird.height
       );
-
-      context.strokeRect(
-        bird.x,
-        bird.y,
-        bird.width,
-        bird.height
-      );
+      // const { x, y } = bird.getCenterCoordinates();
+      // context.beginPath();
+      // context.arc(x, y, bird.radius, 0, 2 * Math.PI);
+      // context.stroke();
+      // context.closePath();
     },
+    getCenterCoordinates() {
+      const { x, y, height, width } = bird;
+      return {
+        x: x + (width / 2),
+        y: y + (height / 2),
+      }
+    }
   };
 
   return bird;
@@ -535,7 +541,7 @@ canvas.addEventListener("click", function () {
 });
 
 window.addEventListener("keypress", function (event) {
-  if (event.keyCode === 32) {
+  if (event.keyCode === 32 || event.keyCode === 120 || event.keyCode === 122) {
     screens.current.click();
   }
 });
