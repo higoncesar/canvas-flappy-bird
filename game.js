@@ -4,7 +4,7 @@ const pointSound = new Audio();
 
 sprites.src = "./sprites.png";
 hitSound.src = "./efects/hit.wav";
-pointSound.src = "./efects/point.wav"
+pointSound.src = "./efects/point.wav";
 
 const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
