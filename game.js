@@ -536,12 +536,16 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
-canvas.addEventListener("click", function () {
+canvas.addEventListener("touchstart", function () {
   screens.current.click();
 });
 
 window.addEventListener("keypress", function (event) {
-  if (event.keyCode === 32 || event.keyCode === 120 || event.keyCode === 122) {
+  if (event.keyCode === 120) {
+    screens.current.click();
+  }
+
+  if (event.keyCode === 122) {
     screens.current.click();
   }
 });
