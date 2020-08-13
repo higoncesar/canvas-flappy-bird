@@ -16,7 +16,7 @@ Did you feel like playing? Just [click here](https://higoncesar.github.io/canvas
 
 <h1 align="center">Challenges and Learnings</h1>
 
-The bigger challenger was learning how to solve collision problem and the criate "infinity" obstacles (pairs pipes). But all of this is more easy when understand and account frames per seconds (FPS);
+The bigger challenger was learning how to solve collision problem and the create "infinity" obstacles (pairs pipes). But it's all easier to solve when understand and account frames per seconds (FPS);
 
 <h1 align="center">FeedBack</h1>
 
