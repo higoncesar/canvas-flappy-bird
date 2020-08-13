@@ -2,9 +2,9 @@ const sprites = new Image();
 const hitSound = new Audio();
 const pointSound = new Audio();
 
-sprites.src = "./sprites.png";
-hitSound.src = "./efects/hit.wav";
-pointSound.src = "./efects/point.wav";
+sprites.src = "./assets/sprites.png";
+hitSound.src = "./sounds_effects/hit.wav";
+pointSound.src = "./sounds_effects/point.wav";
 
 const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
