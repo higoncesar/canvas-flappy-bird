@@ -17,7 +17,13 @@ Did you feel like playing? Just [click here](https://higoncesar.github.io/canvas
 <h1 align="center">Challenges and Learnings</h1>
 
 The bigger challenger was learning how to solve collision problem and the criate "infinity" obstacles (pairs pipes). But all of this is more easy when understand and account frames per seconds (FPS);
-</br>
+
+<h1 align="center">FeedBack</h1>
+
+Do you like? Do you have any doubt? Or suggest something?
+
+Contact me at [Linkedin](https://www.linkedin.com/in/higoncesar/), [Twitter](https://twitter.com/HigonCesar) or [Instagram](instagram.com/higoncesar)
+
 </br>
 </br>
 
@@ -37,4 +43,13 @@ Ficou deu vontade de jogar? Então é só [clicar aqui](https://higoncesar.githu
 
 O maior desafio foi aprender a resolver o problema de colisão e a criação "infinitas" de obstáculos (pares de canos). Mas isso tudo se torna fácil de resolver ao entender e contabilizar quadros por segundo (FPS).
 
+
+<h1 align="center">FeedBack</h1>
+
+Gostou do projeto, quer tirar alguma duvida, ou sugerir algo que poderia ser feito melhor?
+
+Entre em contato comigo pelo [Linkedin](https://www.linkedin.com/in/higoncesar/), [Twitter](https://twitter.com/HigonCesar) ou [Instagram](instagram.com/higoncesar)
+
+
+[![HitCount](http://hits.dwyl.com/higoncesar/canvas-flappy-bird.svg)](http://hits.dwyl.com/higoncesar/canvas-flappy-bird)
 
