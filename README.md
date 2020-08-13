@@ -6,9 +6,9 @@
 
 <h1 align="center">Introduction</h1>
 
-I've always been curious about what it's like to develop a game, then why not challenge me a build one myself? And this repository is the result, my own [FlappyBird](https://en.wikipedia.org/wiki/Flappy_Bird). It was developed using just Javascript, HTML (Canvas) and CSS.
+I've always been curious about what it's like to develop a game, then why not challenge myself to build one ? And this repository is the result, my own [FlappyBird](https://en.wikipedia.org/wiki/Flappy_Bird). It was developed using just Javascript, HTML (Canvas) and CSS.
 
-Did you feel like playing? Just [click here](https://higoncesar.github.io/canvas-flappy-bird/) and enjoy.
+Do you feel like playing? Just [click here](https://higoncesar.github.io/canvas-flappy-bird/) and enjoy.
 
 <p align="center">
   <img align="center"  height="450" src="./assets/demo.gif"/>
